@@ -9,6 +9,6 @@ url='testgif.html'
 #browser=webbrowser.get("chrome")
 
 webbrowser.open(url)
-time.sleep(3) #delay for 5 seconds
 webbrowser.open('http://studio307.github.io/')
+time.sleep(3) #delay for 5 seconds
 

@@ -1,0 +1,28 @@
+<html>
+<head>
+<script language="JavaScript">
+<!--
+function randomgif(){
+var mygifs=new Array()
+//specify random images below. You can have as many as you wish
+mygifs[1]="gifs/gif1.gif"
+mygifs[2]="gifs/gif2.gif"
+mygifs[3]="gifs/gif3.gif"
+mygifs[4]="gifs/gif4.gif"
+mygifs[5]="gifs/gif5.gif"
+mygifs[6]="gifs/gif6.gif"
+
+var ry=Math.floor(Math.random()*mygifs.length)
+if (ry==0)
+ry=1
+document.write('<img src="'+mygifs[ry]+'" border=0>')
+}
+//-->
+var jesspic=randomgif();
+document.getElementById("jesspic").style.backgroundImage = jesspic ;
+//document.getElementById("jessgif").innerHTML = jesspic;
+</script>
+<head>
+<body>
+<!-- <p align="center" id="jessgif"></p> -->
+
