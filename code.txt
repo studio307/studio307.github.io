@@ -1,0 +1,181 @@
+#!/usr/bin/env python
+
+#---------------------------------------------------------
+#importing libraries
+#---------------------------------------------------------
+import tweepy
+
+#-----------------------------------------------------------------
+# Variables that contains the user credentials to access Twitter API
+# Go to dev.twitter.com, using your twitter account, to obtain API keys and tokens
+# do NOT actually put your keys in your code or upload them anywhere
+# we will cover setting up a config file for credentials!!!!!
+#-----------------------------------------------------------------
+
+consumer_key = '5jNcn9fL1SCQIGBue8KFQg6lu'
+consumer_secret = 'GEqW8v8ZYdWIvEEta5QAAX7pGXwnNt2N6uWrNvdsdvA44LCrSS'
+access_key = '782662550089379840-2cjMsNNE6C5QtBa2D9dKfzRbjlYCFd6'
+access_secret = 'ESmuRqJcz0x0ylPKwMV5C71Im1jKuhUohDfKxoSrusxWx'
+
+#authorize twitter, initialize tweepy
+auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
+auth.set_access_token(access_key, access_secret)
+api = tweepy.API(auth)
+
+result_count = 0 # we're going to count the results
+
+for tweet in tweepy.Cursor(api.search, q = "skating, toronto, -RT").items(): #for every tweet returned from this query
+		print('Name: ' + tweet.author.name.encode('utf-8') + '\n') #print the author's name, converted to UTF-8, with line break...
+		print('Screen Name: ' + tweet.author.screen_name.encode('utf-8') + '\n')
+		print('Created: ' + str(tweet.created_at) + '\n')
+		print('Tweet: ' + tweet.text.encode('utf-8') + '\n')
+		print('-----------------End Tweet #------------------' + '\n')
+		result_count +=1 #add 1 to the results count
+	
+print "got %d results" % result_count #print the number of results
+
+
+
+twitterConfig.json
+
+{
+	"consumer_key": "5jNcn9fL1SCQIGBue8KFQg6lu",
+	"consumer_secret": "GEqW8v8ZYdWIvEEta5QAAX7pGXwnNt2N6uWrNvdsdvA44LCrSS",
+	"access_token": "782662550089379840-2cjMsNNE6C5QtBa2D9dKfzRbjlYCFd6",
+	"access_secret": "ESmuRqJcz0x0ylPKwMV5C71Im1jKuhUohDfKxoSrusxWx"
+}
+
+restauth.py
+
+#!/usr/bin/env python
+
+#---------------------------------------------------------
+#importing libraries
+import tweepy
+import json
+#---------------------------------------------------------
+
+#tell python where to look for your config file
+configfile = open("./twitterConfig.json");
+
+# use json library to load your config file
+config = json.load(configfile)
+
+#translate your keys from the json file 
+consumer_key = config['consumer_key']
+consumer_secret = config['consumer_secret']
+access_token = config['access_token']
+access_secret = config['access_secret']
+
+#authorize twitter, initialize tweepy
+auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
+auth.set_access_token(access_token, access_secret)
+api = tweepy.API(auth)
+
+result_count = 0 
+
+for tweet in tweepy.Cursor(api.search, q = "-RT, skating, toronto").items(): ##check tweepy documentation and Twitter API doc'n for more
+		print('-----------------Start Tweet #------------------' + '\n')
+		print('Name: ' + tweet.author.name.encode('utf-8') + '\n')
+		print('Screen Name: ' + tweet.author.screen_name.encode('utf-8') + '\n')
+		print('Created: ' + str(tweet.created_at) + '\n')
+		print('Tweet: ' + tweet.text.encode('utf-8') + '\n')
+		print('-----------------End Tweet #------------------' + '\n')
+		result_count +=1
+		
+print "got %d results" % result_count
+
+
+
+
+
+restauthdump.py
+
+#!/usr/bin/env python
+
+#---------------------------------------------------------
+#importing libraries
+#---------------------------------------------------------
+import tweepy
+import json
+
+#tell python where to look for your config file
+configfile = open("./twitterConfig.json");
+
+# use json library to load your config file
+config = json.load(configfile)
+
+#translate your keys from the json file 
+consumer_key = config['consumer_key']
+consumer_secret = config['consumer_secret']
+access_token = config['access_token']
+access_secret = config['access_secret']
+
+#authorize twitter, initialize tweepy
+auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
+auth.set_access_token(access_token, access_secret)
+api = tweepy.API(auth)
+
+result_count = 0 
+
+with open("mydata.txt", 'a') as f: #make mydata.txt our dump file, and we're appending to it
+	for tweet in tweepy.Cursor(api.search, q = "-RT, skating, toronto").items(): 
+			print('-----------------Start Tweet #------------------' + '\n')
+			print('Name: ' + tweet.author.name.encode('utf-8') + '\n')
+			print('Screen Name: ' + tweet.author.screen_name.encode('utf-8') + '\n')
+			print('Created: ' + str(tweet.created_at) + '\n')
+			print('Tweet: ' + tweet.text.encode('utf-8') + '\n')
+			print('-----------------End Tweet #------------------' + '\n')
+			result_count +=1
+			json.dump(tweet._json, f) #dump it, add ,indent=4 to make it prettier
+			f.write("\n") ##line break 
+			
+	
+print "got %d results" % result_count
+
+
+
+
+simplestream.py
+
+
+#!/usr/bin/env python
+
+import json
+import tweepy
+
+#---------AUTH STUFF----------------------------
+#tell python where to look for your config file
+configfile = open("./twitterConfig.json");
+# use json library to load your config file
+config = json.load(configfile)
+#translate your keys from the json file 
+consumer_key = config['consumer_key']
+consumer_secret = config['consumer_secret']
+access_token = config['access_token']
+access_secret = config['access_secret']
+#authorize twitter, initialize tweepy
+auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
+auth.set_access_token(access_token, access_secret)
+api = tweepy.API(auth)
+#---------------------------------------------------
+
+
+#------------------------------------------
+# Setting up Stream feed
+#------------------------------------------
+
+class Listening(tweepy.StreamListener): ###this code taken from the Tweepy documentation and dataquest.io
+	def on_error(self, status_code): ##if we get an error e.g. rate limited, disconnects and tells us
+		if status_code == 420:
+			return False
+			print(status_code.text)
+	def on_data(self, data): ##a function for when we get data
+		with open('rawdata.json','a') as f: ###open a json dump file for our data
+			f.write(data) ## write our data to our file
+			tweet = json.loads(data) ##also get ready to print to screen
+			print(tweet)	##print to the screen
+			f.close()
+
+stream = tweepy.Stream(api.auth, listener=Listening()) ##setting up the stream, see Tweepy documentation
+stream.filter(track=["library"],languages=['en']) #filtering our stream by search term and language, see https://dev.twitter.com/streaming/overview/request-parameters
